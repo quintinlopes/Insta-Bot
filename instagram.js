@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 const cron = require('node-cron');
+const JSON = require('circular-json');
 
 const BASE_URL = 'https://www.instagram.com/';
 
@@ -18,8 +19,17 @@ const instagram = {
 			headless: false,
 			args: ['--no-sandbox', '--disable-setuid-sandbox'],
 		});
-		instagram.page = await instagram.browser.newPage();
-		await instagram.page.goto(BASE_URL);
+
+		try {
+			instagram.page = await instagram.browser.newPage();
+			var respons = await instagram.page.goto(BASE_URL);
+			res.json(JSON.stringify(respons))
+		} catch (err) {
+			console.log(err);
+		}
+
+
+
 
 		// Promise.all([
 		// 	page.setExtraHTTPHeaders(…),
@@ -28,11 +38,11 @@ const instagram = {
 		// ]).then(() => {
 		// 	// page is ready
 		// });
-		console.log("I am done at")
-		let task = cron.schedule("* * * * * *", () => {
-			console.log("done from schedule");
-		})
-		task.stop();
+		// console.log("I am done at")
+		// let task = cron.schedule("* * * * * *", () => {
+		// 	console.log("done from schedule");
+		// })
+		// task.stop();
 
 
 
@@ -81,10 +91,12 @@ const instagram = {
 	},
 
 	likeTagsProcesses: async (req, res) => {
-		const quant = req.quant;
-		let tag = req.tag.replace(/\s/g, '');
+		var quant = req.body.quant;
+
+
+		// .replace(/\s/g, '');
 		// for (let tag of tags) {
-		await instagram.page.goto(TAG_URL(tag), { waitUntil: 'networkidle2' });
+		await instagram.page.goto(TAG_URL(req.body.tag), { waitUntil: 'networkidle2' });
 		await instagram.page.waitFor(1000);
 
 		let posts = await instagram.page.$$('article > div:nth-child(3) img[decoding="auto"]');
@@ -93,6 +105,7 @@ const instagram = {
 		for (let i = 0; i < quant; i++) {
 
 			let post = posts[i];
+			console.log(post);
 
 			await post.click();
 
@@ -123,7 +136,7 @@ const instagram = {
 	},
 
 	followPeople: async (req, res) => {
-		const quant = req.quant;
+		let quant = req.body.quant;
 
 		await instagram.page.goto(PEOPLE_URL, { waitUntil: 'networkidle2' });
 		await instagram.page.waitFor(1000);
@@ -144,7 +157,7 @@ const instagram = {
 	},
 
 	unfollowPeople: async (req, res) => {
-		const quant = req.quant
+		let quant = req.body.quant
 
 		await instagram.page.goto(UNFOLLOW_PEOPLE, { waitUntil: 'networkidle2' });
 		await instagram.page.waitFor(1000);

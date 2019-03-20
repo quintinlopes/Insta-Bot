@@ -28,7 +28,7 @@ class App extends Component {
 
   Start = async () => {
     const res = API.start()
-    // console.log(res);
+    console.log(res);
 
   }
 
@@ -44,7 +44,6 @@ class App extends Component {
   }
 
   Follow = async () => {
-    console.log("press");
     const res = await API.follow(this.state.followQuant);
     console.log(res);
   }

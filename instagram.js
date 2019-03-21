@@ -15,9 +15,11 @@ const instagram = {
 	page: null,
 
 	initialize: async (req, res) => {
+		
 		instagram.browser = await puppeteer.launch({
 			headless: false,
 			args: ['--no-sandbox', '--disable-setuid-sandbox'],
+			executablePath: "//Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
 		});
 
 		try {
